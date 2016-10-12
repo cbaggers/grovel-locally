@@ -1,5 +1,5 @@
 ;;;; package.lisp
 
 (defpackage #:grovel-cache
-  (:use #:cl))
-
+  (:use #:cl #:cffi-grovel #:uiop #:asdf
+        #:with-cached-reader-conditionals))
