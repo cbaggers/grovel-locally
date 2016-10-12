@@ -1,7 +1,5 @@
 (in-package #:grovel-cache)
 
-
-
 (defun generate-c-file* (c-file forms)
   (with-standard-io-syntax
     (let ((*print-readably* nil)
@@ -38,33 +36,22 @@
                       (t (push f forms)))))
                (process-form form)))))
     (with-open-file (in input-file :direction :input)
-      (with-cached-reader-conditionals (read-forms in)))))
+      (read-forms in))))
 
 
  ;;; *PACKAGE* is rebound so that the IN-PACKAGE form can set it during
  ;;; *the extent of a given grovel file.
-(defun process-grovel-file* (input-file dest-lisp-file c-file exe-file absolute-cache-dir)
+(defun process-grovel-file* (input-file dest-lisp-file c-file exe-file)
   (with-standard-io-syntax
-    (multiple-value-bind (forms feature-expressions)
-        (read-grovel-file* input-file)
-      (let* ((cached-lisp-file (feature-specific-cache-file
-                                dest-lisp-file absolute-cache-dir
-                                feature-expressions))
-             (*local-includes* nil))
-        (if (and cached-lisp-file (file-exists-p cached-lisp-file))
-            (process-grovel-file-from-cache dest-lisp-file c-file
-                                            cached-lisp-file)
-            (process-grovel-file-from-scratch forms dest-lisp-file c-file
-                                              exe-file cached-lisp-file))
+    (let ((forms (read-grovel-file* input-file)))
+      (let ((*local-includes* nil))
+        (unless (file-exists-p dest-lisp-file)
+          (process-grovel-file-from-scratch forms dest-lisp-file c-file
+                                            exe-file))
         dest-lisp-file))))
 
-(defun process-grovel-file-from-cache (dest-lisp-file c-file cached-lisp-file)
-  (touch-file c-file)
-  (alexandria:copy-file cached-lisp-file dest-lisp-file
-                        :if-to-exists :supersede))
 
-(defun process-grovel-file-from-scratch (forms dest-lisp-file c-file exe-file
-                                         cached-lisp-file)
+(defun process-grovel-file-from-scratch (forms dest-lisp-file c-file exe-file)
   (generate-c-file* c-file forms)
   (let* ((lisp-file (cffi-grovel::tmp-lisp-file-name c-file))
          (inputs (list (cffi-grovel::cc-include-grovel-argument)
@@ -77,10 +64,6 @@
       (error (e) (grovel-error "~a" e)))
     (cffi-grovel::invoke exe-file lisp-file)
     (rename-file-overwriting-target lisp-file dest-lisp-file)
-    (when cached-lisp-file
-      (ensure-directories-exist
-       (pathname-directory-pathname cached-lisp-file))
-      (alexandria:copy-file dest-lisp-file cached-lisp-file
-                            :if-to-exists :supersede))))
+    dest-lisp-file))
 
 ;;------------------------------------------------------------

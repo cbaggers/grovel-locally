@@ -14,27 +14,19 @@
 
 (defmethod perform ((op cffi-grovel::process-op) (c caching-grovel-file))
   (destructuring-bind (output-file c-file exe-file) (output-files op c)
-    (break "WHAT-HO CRACKERJACK
-~s
-~s
-~s" output-file c-file exe-file)
-    (let* ((input-file (first (input-files op c)))
-           (absolute-cache-dir
-            (absolute-cache-dir input-file (cache-dir-of c))))
-      (process-grovel-file*
-       input-file output-file c-file exe-file absolute-cache-dir))))
+    (let* ((input-file (first (input-files op c))))
+      (process-grovel-file* input-file output-file c-file exe-file))))
 
 (defmethod perform ((op cffi-grovel::process-op) (c caching-wrapper-file))
   (destructuring-bind (output-file lib-name c-file o-file) (output-files op c)
-    (let* ((input-file (first (input-files op c))))
+    (let* ((spec-file (first (input-files op c))))
       (process-wrapper-file* (component-system c)
-                             input-file
+                             spec-file
                              output-file
                              lib-name
                              c-file
                              o-file
-                             :lib-soname (cffi-grovel::wrapper-soname c)
-                             :cache-dir (sys-relative-cache-dir c)))))
+                             :lib-soname (cffi-grovel::wrapper-soname c)))))
 
 ;;------------------------------------------------------------
 
