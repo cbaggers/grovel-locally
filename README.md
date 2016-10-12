@@ -1,1 +1,1 @@
-This is the stub README.txt for the "grovel-cache" project.
+This is the stub README.txt for the "grovel-locally" project.

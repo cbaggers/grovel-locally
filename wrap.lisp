@@ -1,4 +1,4 @@
-(in-package #:grovel-cache)
+(in-package #:grovel-locally)
 
 (defun read-wrapper-spec (input-file)
  (with-open-file (in input-file :direction :input)

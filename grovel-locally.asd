@@ -1,6 +1,6 @@
-;;;; grovel-cache.asd
+;;;; grovel-locally.asd
 
-(asdf:defsystem #:grovel-cache
+(asdf:defsystem #:grovel-locally
   :description "Grovel using cffi and cache the result locally to the system"
   :author "Chris Bagley (Baggers) <techsnuffle@gmail.com>"
   :license "BSD 2 Clause"

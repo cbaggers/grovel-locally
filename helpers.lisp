@@ -1,4 +1,4 @@
-(in-package #:grovel-cache)
+(in-package #:grovel-locally)
 
 (defun asdf-path (system &rest path)
   (asdf:component-pathname

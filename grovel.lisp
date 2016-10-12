@@ -1,4 +1,4 @@
-(in-package #:grovel-cache)
+(in-package #:grovel-locally)
 
 (defun generate-c-file* (c-file forms)
   (with-standard-io-syntax
