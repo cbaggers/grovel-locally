@@ -44,3 +44,8 @@
           (or (operating-system) (software-type))
           (or (architecture) (machine-type))
           (djb2 (format nil "~{~a~}" features))))
+
+(defun get-spec-features (input-file)
+  (with-cached-reader-conditionals
+    (with-open-file (in input-file :direction :input)
+      (loop :for form = (read in nil nil) :while form))))
