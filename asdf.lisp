@@ -10,8 +10,6 @@
 
 ;;------------------------------------------------------------
 
-(defvar *foooo* 1)
-
 (defmethod perform ((op cffi-grovel::process-op) (c caching-grovel-file))
   (destructuring-bind (output-file c-file exe-file) (output-files op c)
     (let* ((input-file (first (input-files op c))))
@@ -74,12 +72,6 @@
             t)))
 
 ;;------------------------------------------------------------
-
-(defun absolute-cache-dir (input-file cache-dir)
-  (when cache-dir
-    (let ((input-dir (pathname-directory-pathname input-file)))
-      (ensure-directory-pathname
-       (subpathname input-dir cache-dir)))))
 
 (defun system-to-component-path (component)
   (let* ((sys (component-system component))
