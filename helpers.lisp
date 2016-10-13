@@ -39,11 +39,15 @@
                        wrap)))
     hash))
 
+(defun processed-os-id ()
+  (cl-ppcre:regex-replace-all "[ \\.]" (os-id) "_"))
+
 (defun gen-feature-hash (features)
-  (format nil "~a_~a_~x"
-          (or (operating-system) (software-type))
+  (format nil "~a_~a~@[_~x~]"
+          (or (processed-os-id) (software-type))
           (or (architecture) (machine-type))
-          (djb2 (format nil "~{~a~}" features))))
+          (when features
+            (djb2 (format nil "~{~a~}" features)))))
 
 (defun get-spec-features (input-file)
   (with-cached-reader-conditionals
