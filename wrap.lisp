@@ -14,8 +14,8 @@
          :do (cffi-grovel::process-wrapper-form cffi-grovel::out form)))
      (values c-file (nreverse cffi-grovel::*lisp-forms*))))
 
-(defun generate-bindings-file* (lib-file lib-soname lisp-forms output-defaults
-                                system)
+(defun generate-bindings-file* (lib-soname lisp-forms output-defaults
+                                system sys-local-lib-name)
   (with-standard-io-syntax
     (let ((lisp-file (cffi-grovel::tmp-lisp-file-name output-defaults))
           (*print-readably* nil)
@@ -28,9 +28,10 @@
                (let ((*package* (find-package :keyword))
                      (*read-eval* nil))
                  (read-from-string lib-soname)))
-              (search-file `(system-relative-pathname
+              (search-file `(asdf:system-relative-pathname
                              ,(component-name system)
-                             ,(pathname-directory-pathname lib-file))))
+                             ,(pathname-directory-pathname
+                               sys-local-lib-name))))
           (pprint `(progn
                      (cffi:define-foreign-library
                          (,named-library-name
@@ -48,18 +49,19 @@
 
 
 (defun process-wrapper-file* (system spec-file dest-lisp-file dest-lib-file
-                              c-file o-file &key lib-soname)
+                              c-file o-file lib-soname sys-local-lib-name)
    (with-standard-io-syntax
     (multiple-value-bind (input-data) (read-wrapper-spec spec-file)
       (let* ((*local-includes* nil))
         (unless (process-from-cache-p system dest-lisp-file dest-lib-file)
           (process-wrapper-file-from-scratch system input-data dest-lisp-file
                                              lib-soname dest-lib-file c-file
-                                             o-file))
+                                             o-file sys-local-lib-name))
         (values dest-lisp-file dest-lib-file)))))
 
 (defun process-wrapper-file-from-scratch (system input-data dest-lisp-file
-                                          lib-soname lib-file c-file o-file)
+                                          lib-soname lib-file c-file o-file
+                                          sys-local-lib-name)
   ;;
   (multiple-value-bind (c-file lisp-forms)
       (generate-c-lib-file input-data c-file)
@@ -68,8 +70,9 @@
         (push (copy-local-includes-to-cache c-file) inputs))
       (cffi-grovel::cc-compile o-file inputs))
     (cffi-grovel::link-shared-library lib-file (list o-file))
-    (let ((tmp-file (generate-bindings-file* lib-file lib-soname lisp-forms
-                                             dest-lisp-file system)))
+    (let ((tmp-file (generate-bindings-file* lib-soname lisp-forms
+                                             dest-lisp-file system
+                                             sys-local-lib-name)))
       (unwind-protect (alexandria:copy-file tmp-file dest-lisp-file
                                             :if-to-exists :supersede)
         (delete-file tmp-file))

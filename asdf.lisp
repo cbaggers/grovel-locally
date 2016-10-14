@@ -17,14 +17,17 @@
 
 (defmethod perform ((op cffi-grovel::process-op) (c caching-wrapper-file))
   (destructuring-bind (output-file lib-name c-file o-file) (output-files op c)
-    (let* ((spec-file (first (input-files op c))))
+    (let* ((spec-file (first (input-files op c)))
+           (sys-local-lib-name
+            (uiop:subpathname* (system-to-component-path c) lib-name)))
       (process-wrapper-file* (component-system c)
                              spec-file
                              output-file
                              lib-name
                              c-file
                              o-file
-                             :lib-soname (cffi-grovel::wrapper-soname c)))))
+                             (cffi-grovel::wrapper-soname c)
+                             sys-local-lib-name))))
 
 ;;------------------------------------------------------------
 
@@ -50,7 +53,7 @@
   (let* ((input-file (first (input-files op c)))
          (input-name (pathname-name input-file))
          (features (get-spec-features input-file))
-         (cache-dir (sys-relative-cache-dir c))
+         (cache-dir (cache-dir-of c))
          (output-file (feature-specific-cache-file
                        (make-pathname
                         :name input-name

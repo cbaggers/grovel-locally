@@ -25,8 +25,9 @@
        (subpathname cache-dir (gen-feature-hash feature-expressions))))))
 
 (defun feature-specific-cache-file (file-name cache-dir feature-expressions)
-  (let ((fs-cache-dir (feature-specific-cache-dir
-                       cache-dir feature-expressions)))
+  (let* ((cache-dir (uiop:ensure-directory-pathname cache-dir))
+         (fs-cache-dir (feature-specific-cache-dir
+                        cache-dir feature-expressions)))
     (when fs-cache-dir
       (subpathname fs-cache-dir (pathname-name file-name)
                    :type (pathname-type file-name)))))
