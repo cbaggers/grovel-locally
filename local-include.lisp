@@ -13,15 +13,15 @@
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (pushnew 'include-local cffi-grovel::*header-forms*))
+  (pushnew 'cffi-grovel::include-local cffi-grovel::*header-forms*))
 
 ;;; OUT is lexically bound to the output stream within BODY.
-(cffi-grovel::define-grovel-syntax include-local (&rest paths)
+(cffi-grovel::define-grovel-syntax cffi-grovel::include-local (&rest paths)
   (format cffi-grovel::out "~{#include <~A>~%~}"
           (mapcar #'push-local-include paths)))
 
 ;;; OUT is lexically bound to the output stream within BODY.
-(cffi-grovel::define-wrapper-syntax include-local (&rest paths)
+(cffi-grovel::define-wrapper-syntax cffi-grovel::include-local (&rest paths)
   (format cffi-grovel::out "~{#include <~A>~%~}"
           (mapcar #'push-local-include paths)))
 
