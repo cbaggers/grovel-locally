@@ -38,7 +38,7 @@
                           :type :grovel-wrapper
                           :search-path ,search-file)
                        (t ,(namestring
-                            (cffi-grovel::make-lib-file-name lib-soname))))
+                            (cffi-grovel::make-so-file-name lib-soname))))
                      (cffi:use-foreign-library ,named-library-name))
                   out)
           (fresh-line out))

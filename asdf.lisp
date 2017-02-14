@@ -67,7 +67,7 @@
                   cache-dir features))
          (lib-soname (cffi-grovel::wrapper-soname c))
          (lib-file (feature-specific-cache-file
-                    (cffi-grovel::make-lib-file-name
+                    (cffi-grovel::make-so-file-name
                      (cffi-grovel::make-soname lib-soname output-file))
                     cache-dir features)))
     ;; Return but don't transform to .cache dir
